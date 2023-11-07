@@ -15,7 +15,7 @@ def predict_result(data):
     
 def output_process(output):    
     #라벨링 된 값을 문자열로 변환    
-    df = pd.read_csv("final_dataset.csv")
+    df = pd.read_csv("travel_dataset.csv")
     unique_lodAddress = df["LOTNO_ADDR"].unique()
     # output_processed = ("충북 영동군 영동읍 계산리 653-12")    
     output_processed = unique_lodAddress
