@@ -1,0 +1,73 @@
+from PIL import Image
+import requests
+import os
+from flask import Flask, request, jsonify
+from flask_restx import Resource, Api, fields, Namespace
+
+app = Flask(__name__)
+api = Api(app)
+
+# Namespace 생성
+ns = Namespace('data', description='데이터 처리')
+
+# 필드 정의 (튜플 형태로 데이터를 받음)
+data_model = api.model('DataModel', {
+    'tuple_data': fields.Raw(required=True, description='튜플 형태의 데이터')
+})
+
+# 예측 모델 및 이미지 처리 함수 (모델 및 이미지 경로는 여기에 포함하지 않음)
+def predict_result(data):
+    # 예측 모델 호출 및 결과 반환 (구체적인 구현은 모델에 따라 다름)
+    # 여기서는 단순히 0 또는 1을 반환하는 것으로 가정합니다.
+    return 0
+
+def process_image(image_path):
+    # 이미지 처리 로직 (예시: 이미지 크기 변경)
+    image = Image.open(image_path)
+    image.thumbnail((300, 300))
+    image.save(image_path)
+
+@ns.route('/process_data')
+class ProcessData(Resource):
+    @ns.expect(data_model)
+    def post(self):
+        # 클라이언트에서 JSON 데이터를 받음
+        received_data = api.payload['tuple_data']
+
+        if not isinstance(received_data, tuple):
+            return {'error': '튜플 형태의 데이터가 아닙니다.'}, 400
+
+        # 예측 모델 호출
+        prediction_result = predict_result(received_data)
+
+        # 이미지 처리 및 전송
+        image_paths = ['image/sample1.jpg', 'image/sample2.jpg', 'image/sample3.jpg']  # 여러 이미지 파일 경로
+        processed_data_list = []  # 처리된 데이터를 담을 리스트
+
+        for image_path in image_paths:
+            process_image(image_path)  # 이미지 처리 함수 호출
+
+            with open(image_path, 'rb') as image_file:
+                files = {'image': ('sample.jpg', image_file, 'image/jpeg')}
+                payload = {
+                    'result': prediction_result,
+                    'processed_data': {
+                        'result': prediction_result
+                    }
+                }
+                response = requests.post('http://relative_server_endpoint', data=payload, files=files)
+
+                if response.status_code != 200:
+                    return {'error': '상대 서버에 데이터 및 이미지 전송 실패'}, 500
+
+            processed_data_list.append({'result': prediction_result})
+
+        # 튜플 데이터 처리 로직을 여기에 추가
+        processed_data = {
+            'result_list': processed_data_list
+        }
+
+        return processed_data, 201
+
+if __name__ == '__main__':
+    app.run(debug=True)

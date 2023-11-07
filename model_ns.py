@@ -32,17 +32,16 @@ Recommend_Model = Namespace(
 
 RM_Input = Recommend_Model.model('Recommend Model Input', {  # Model 객체 생성
     'input_data' : fields.List(fields.Integer, required=True\
-        ,default=[0,0,0,0,0,0,0,0,0]\
+        ,default=[0, 0, 0, 0,0,0, 0, 0,0,0, 0, 0]\
         ,description='[성별(AGE), \
                         여행동반자관계(TCR),  \
                         동반자연령대(AGE), \
-                        여행동기(TMT),  \
+                        여행동기(TMT)1~3,  \
                         여행스타일(TSY),  \
-                        미션(MIS),  \
+                        미션(MIS)1~3,  \
                         소득(INC), \
-                        숙소유형(HTY), \
-                        미션(MIS)]'\
-        ,example="[0,0,0,0,0,0,0,0,0]")
+                        숙소유형(HTY),]'\
+        ,example="[0, 0, 0, 0,0,0, 0, 0,0,0, 0, 0]")
 })
 
 RM_Recommend = Recommend_Model.model('RM Recommend output', {
